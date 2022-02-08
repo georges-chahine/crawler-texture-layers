@@ -1,0 +1,7 @@
+<launch>
+<node pkg="crawler_projection" type="crawler_projection" name="crawler_projection" output="screen"> 
+ 	<remap from="/livox/lidar" to="/livox/lidar" />   
+</node>
+
+</launch>
+
