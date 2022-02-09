@@ -16,7 +16,7 @@
 #include <pcl_ros/transforms.h>
 #include <pcl/octree/octree_search.h>
 #include <crawler_msgs/TextureTriggerSrv.h>
-#include <crawler_msgs/LiveTexture.h>
+#include <live_texture_msgs/LiveTexture.h>
 #include <crawler_msgs/PoseTriggerSrv.h>
 //#include <pcl/features/normal_3d_omp.h>
 #include <pcl/common/transforms.h>
@@ -64,7 +64,7 @@ protected:
     int erosion_size = 2;
     int dilation_size =4;
 
-    bool getTexture, mergeTextures_, keepBackground_;
+    bool getTexture, mergeTextures_, keepBackground_, low_level_layer_;
     std::string icpParamPath;
     std::string icpInputParamPath;
     std::string icpPostParamPath;
@@ -245,7 +245,7 @@ protected:
         msg->header.stamp=h.stamp;
         msg->header.frame_id="base_link";
 
-        crawler_msgs::LiveTexture texture;
+        live_texture_msgs::LiveTexture texture;
         //header.stamp=header.stamp;
         //header.seq=img_msg->header.seq;
 
@@ -570,9 +570,9 @@ protected:
 
         if (init && !newData){  //dynamic mapping
 
+if (low_level_layer_){
 
-
-
+		
 
             pcl::PointCloud<pcl::PointXYZ>::Ptr inliers_pcl_acc_tmp3 (new pcl::PointCloud<pcl::PointXYZ>);
             pcl::PointCloud<pcl::PointXYZ>::Ptr outliers_pcl_acc_tmp3 (new pcl::PointCloud<pcl::PointXYZ>);
@@ -599,12 +599,12 @@ protected:
 
 
 
+}
+else{
 
 
 
 
-
-/*
             Eigen::Rotation2D<double> pose_inv_rot(temp);
             // double yaw = pose_inv_rot.angle()-lastYaw;
             double yaw = current_angle - lastYaw;
@@ -664,7 +664,7 @@ protected:
 
 
 
-*/
+}
 
 
 
@@ -843,7 +843,7 @@ public:
         lastTime=0;
         //      PoseTriggerSrv
         n.param<double>("resolution", resolution_, 0.01);
-
+        n.param<bool>("low_level_layer", low_level_layer_, true);
         n.param<bool>("merge_textures", mergeTextures_, false);
         n.param<bool>("keep_merged_texture_background", keepBackground_, false);
         n.param<double>("rotation_tuning", rotationTuning, -4);
@@ -870,15 +870,15 @@ public:
 
         //coloredScanPublisher = n.advertise<pcl::PointCloud<pcl::PointXYZRGBAI> > ("livox/lidar_colored", 1);
 
-        inliersTexturePub = n.advertise<crawler_msgs::LiveTexture> ("texture_inliers", 1);
-        outliersTexturePub = n.advertise<crawler_msgs::LiveTexture> ("texture_outliers", 1);
+        inliersTexturePub = n.advertise<live_texture_msgs::LiveTexture> ("texture_inliers", 1);
+        outliersTexturePub = n.advertise<live_texture_msgs::LiveTexture> ("texture_outliers", 1);
 
 
 
 
         if (mergeTextures_){
 
-            mergedTexturePub = n.advertise<crawler_msgs::LiveTexture> ("texture_merged", 1);
+            mergedTexturePub = n.advertise<live_texture_msgs::LiveTexture> ("texture_merged", 1);
 
         }
         // scan_sub_ = nh_.subscribe("inliers",1,&Mapper::inliers_callback,this);
